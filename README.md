@@ -1,9 +1,10 @@
 # cloudflare-dyndns
 
 *WIP*
+
 Set the IP for a hostname to your current WAN ip on a domain hosted on Cloudflare DNS.
 
-This progrem looks up "myip.opendns.com" on resolver1.opendns.com to get your WAN ip and uses this to update the configured hostnames using the Cloudflare API.
+This program looks up "myip.opendns.com" on resolver1.opendns.com to get your WAN ip and uses this to update the configured hostnames using the Cloudflare API.
 
 ## Installation
 
