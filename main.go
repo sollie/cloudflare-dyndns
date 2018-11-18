@@ -14,6 +14,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	version string
+	date    string
+)
+
 // NSRecord Contains output from getIP
 type NSRecord struct {
 	Type    string `json:"type"`
@@ -78,6 +83,7 @@ type ChgResponse struct {
 }
 
 func main() {
+	fmt.Printf("%s version %s, %s\n", os.Args[0], version, date)
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("cloudflare-dyndns")
 	viper.AddConfigPath("/etc/cloudflare-dyndns/")
@@ -112,7 +118,6 @@ func main() {
 				}
 			} else {
 				fmt.Println("IP already up to date.")
-				fmt.Println("Exiting...")
 			}
 		} else {
 			for _, e := range id.Errors {
