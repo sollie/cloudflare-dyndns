@@ -1,0 +1,6 @@
+zoneid: 
+auth-email: 
+auth-key: 
+hostnames:
+  - my.host.name
+  - another.host.name
