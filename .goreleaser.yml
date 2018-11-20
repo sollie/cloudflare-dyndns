@@ -1,0 +1,36 @@
+builds:
+- env:
+  goos:
+    - linux
+    - windows
+    - darwin
+  goarch:
+    - amd64
+    - arm
+  goarm:
+    - 5
+  ldflags:
+    - -s -w -X main.version={{.Version}}
+  ignore:
+    - goos: darwin
+      arch: arm
+    - goos: windows
+      arch: arm
+archive:
+  replacements:
+    amd64: x86_64
+  files:
+    - 'cloudflare-dyndns.yaml.dist'
+  name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+checksum:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^archive:'
+    - '^Makefile:'
+    - '^cloudflare-dyndns.yaml:'
+
