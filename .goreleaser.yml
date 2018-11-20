@@ -33,4 +33,5 @@ changelog:
     - '^archive:'
     - '^Makefile:'
     - '^cloudflare-dyndns.yaml:'
-
+sign:
+   artifacts: checksum
