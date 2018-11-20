@@ -13,9 +13,9 @@ builds:
     - -s -w -X main.version={{.Version}}
   ignore:
     - goos: darwin
-      arch: arm
+      goarch: arm
     - goos: windows
-      arch: arm
+      goarch: arm
 archive:
   replacements:
     amd64: x86_64
