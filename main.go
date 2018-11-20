@@ -15,8 +15,7 @@ import (
 )
 
 var (
-	version string
-	date    string
+	version string = "GIT"
 )
 
 // NSRecord Contains output from getIP
