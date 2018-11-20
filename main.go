@@ -82,7 +82,7 @@ type ChgResponse struct {
 }
 
 func main() {
-	fmt.Printf("%s version %s, %s\n", os.Args[0], version, date)
+	fmt.Printf("%s version %s\n", os.Args[0], version)
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("cloudflare-dyndns")
 	viper.AddConfigPath("/etc/cloudflare-dyndns/")
