@@ -1,6 +1,8 @@
-zoneid: 
 auth-email: 
 auth-key: 
-hostnames:
-  - my.host.name
-  - another.host.name
+zones:
+  domain.tld:
+    - myhost.domain.tld
+    - anotherhost.domain.tld
+  otherdomain.tld:
+    - site.otherdomain.tld
