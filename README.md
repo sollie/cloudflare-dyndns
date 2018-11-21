@@ -8,7 +8,7 @@ This program looks up "myip.opendns.com" on resolver1.opendns.com to get your WA
 
 ## Installation
 
-Install using `go get github.com/sollie/cloudflare-dyndns`.
+Install using `go get github.com/sollie/cloudflare-dyndns` or fetch a prebuilt [release](https://github.com/sollie/cloudflare-dyndns/releases).
 
 ## Configuration
 
