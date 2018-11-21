@@ -27,4 +27,5 @@ zones:
     - myhost.domain.tld
     - anotherhost.domain.tld
   otherdomain.tld:
-    - site.otherdomain.tld```
+    - site.otherdomain.tld
+```
