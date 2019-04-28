@@ -124,7 +124,6 @@ func main() {
 	}
 
 	// Use OpenDNS to look up external IP
-	//var wanip = getIP("whoami.akamai.net", "ns1-1.akamaitech.net")
 	var wanip = getIP("myip.opendns.com", "resolver1.opendns.com")
 
 	for domain, hosts := range viper.Get("zones").(map[string]interface{}) {
