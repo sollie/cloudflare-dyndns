@@ -177,11 +177,12 @@ func getID(hostname, zoneid string) GetResponse {
 	url := fmt.Sprintf("https://api.cloudflare.com/client/v4/zones/%s/dns_records/?name=%s", zoneid, hostname)
 
 	body, err := doReq(url, "GET", nil)
+
+	result := GetResponse{}
+
 	if err = json.Unmarshal(body, &result); err != nil {
 		panic(err)
 	}
-
-	result := GetResponse{}
 
 	return result
 }
@@ -191,11 +192,12 @@ func getZoneID(domain string) ZneResponse {
 	url := fmt.Sprintf("https://api.cloudflare.com/client/v4/zones?name=%s", domain)
 
 	body, err := doReq(url, "GET", nil)
+
+	result := ZneResponse{}
+
 	if err = json.Unmarshal(body, &result); err != nil {
 		panic(err)
 	}
-
-	result := ZneResponse{}
 
 	return result
 }
@@ -218,11 +220,12 @@ func updateHost(hostname, ip, zoneid, id string) ChgResponse {
 	reqBody := bytes.NewReader(nsBytes)
 
 	body, err := doReq(url, "PUT", reqBody)
+
+	result := ChgResponse{}
+
 	if err = json.Unmarshal(body, &result); err != nil {
 		panic(err)
 	}
-
-	result := ChgResponse{}
 
 	return result
 }
