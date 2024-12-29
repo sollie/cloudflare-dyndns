@@ -1,8 +1,0 @@
-auth-email: 
-auth-key: 
-zones:
-  domain.tld:
-    - myhost.domain.tld
-    - anotherhost.domain.tld
-  otherdomain.tld:
-    - site.otherdomain.tld
