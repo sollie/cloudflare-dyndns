@@ -28,7 +28,7 @@ func getZoneID(api *cloudflare.API, domain string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("Zone not found: %s", domain)
+	return "", fmt.Errorf("zone not found: %s", domain)
 }
 
 func getRecordID(ctx context.Context, api *cloudflare.API, zoneID string, recordName string) (string, error) {
@@ -39,7 +39,7 @@ func getRecordID(ctx context.Context, api *cloudflare.API, zoneID string, record
 	}
 
 	if len(records) == 0 {
-		return "", fmt.Errorf("Record not found")
+		return "", fmt.Errorf("record not found")
 	}
 
 	return records[0].ID, nil
