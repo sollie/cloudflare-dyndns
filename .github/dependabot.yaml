@@ -1,0 +1,25 @@
+updates:
+  - directory: /source
+    open-pull-requests-limit: 100
+    package-ecosystem: gomod
+    schedule:
+      day: saturday
+      interval: weekly
+  - directory: /
+    open-pull-requests-limit: 100
+    package-ecosystem: github-actions
+    schedule:
+      day: saturday
+      interval: weekly
+  - directory: /
+    ignore:
+      - dependency-name: php-*
+        update-types:
+          - version-update:semver-major
+          - version-update:semver-minor
+    open-pull-requests-limit: 100
+    package-ecosystem: docker
+    schedule:
+      day: saturday
+      interval: weekly
+version: 2
