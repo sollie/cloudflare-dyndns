@@ -1,33 +1,65 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log/slog"
 	"os"
+	"time"
 
+	"github.com/cloudflare/cloudflare-go"
 	"github.com/miekg/dns"
-	"github.com/spf13/viper"
 )
 
-var version = "GIT"
+var (
+	version  = "GIT"
+	cfClient *cloudflare.API
+)
 
 func main() {
-	fmt.Printf("%s version %s\n", os.Args[0], version)
-	viper.SetConfigType("yaml")
-	viper.SetConfigName("cloudflare-dyndns")
-	viper.AddConfigPath("/etc/cloudflare-dyndns/")
-	viper.AddConfigPath("$HOME/.cloudflare-dyndns")
-	viper.AddConfigPath(".")
-	err := viper.ReadInConfig()
+	slog.Info(os.Args[0] + " version " + version)
+
+	wanip := getIP("whoami.cloudflare", "1.1.1.1")
+	slog.Info("WAN IP: " + wanip)
+
+	cfClient, err := cloudflareInit()
 	if err != nil {
-		fmt.Printf("Fatal error config file: %s \n", err)
+		slog.Error(err.Error())
 		os.Exit(1)
 	}
 
-	wanip := getIP("whoami.cloudflare", "1.1.1.1")
+	for _, domain := range config.Domains {
+		zoneID, err := getZoneID(cfClient, domain.Tld)
+		if err != nil {
+			slog.Error(err.Error())
+			continue
+		}
 
-	for domain, hosts := range viper.Get("zones").(map[string]interface{}) {
-		processDomain(domain, hosts.([]interface{}))
+		for _, subdomain := range domain.Subdomains {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+
+			recordName := subdomain + "." + domain.Tld
+			recordID, err := getRecordID(ctx, cfClient, zoneID, recordName)
+			if err != nil {
+				if err.Error() == "Record not found" {
+					record, err := createDNSRecord(ctx, cfClient, zoneID, "A", recordName, "127.0.0.1", 300)
+					if err != nil {
+						slog.Error(err.Error())
+						continue
+					}
+					recordID = record.ID
+				} else {
+					slog.Error(err.Error())
+					continue
+				}
+
+				err = updateRecord(ctx, cfClient, zoneID, recordID, recordName, wanip)
+				if err != nil {
+					slog.Error(err.Error())
+					continue
+				}
+			}
+		}
 	}
 }
 
@@ -43,10 +75,10 @@ func getIP(target string, server string) string {
 
 	r, _, err := c.Exchange(m, server+":53")
 	if err != nil {
-		slog.Fatal(err)
+		slog.Error(err.Error())
 	}
 	if len(r.Answer) == 0 {
-		slog.Fatal("No results")
+		slog.Warn("No answer")
 	}
 
 	Arec := r.Answer[0].(*dns.TXT)
