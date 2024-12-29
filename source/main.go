@@ -41,7 +41,7 @@ func main() {
 			recordName := subdomain + "." + domain.Tld
 			recordID, err := getRecordID(ctx, cfClient, zoneID, recordName)
 			if err != nil {
-				if err.Error() == "Record not found" {
+				if err.Error() == "record not found" {
 					record, err := createDNSRecord(ctx, cfClient, zoneID, "A", recordName, "127.0.0.1", 300)
 					if err != nil {
 						slog.Error(err.Error())

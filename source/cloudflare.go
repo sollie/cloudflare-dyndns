@@ -59,6 +59,7 @@ func createDNSRecord(ctx context.Context, client *cloudflare.API, zoneID, record
 	if err != nil {
 		return cloudflare.DNSRecord{}, fmt.Errorf("failed to create DNS record: %w", err)
 	}
+
 	return record, nil
 }
 
