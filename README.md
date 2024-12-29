@@ -10,7 +10,7 @@ using `docker pull ghcr.io/sollie/cloudflare-dyndns:latest`.
 
 ## Configuration
 
-In v1 the configuration is done using environment variables. The following variables are required:
+In v1 the configuration is done using environment variables.
 
 ### Required:
 * CFDD_TOKEN: Cloudflare API token with Edit permissions on the zone(s) you want to update.
