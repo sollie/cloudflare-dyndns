@@ -54,7 +54,7 @@ func init() {
 
 		config.Domains = append(config.Domains, Domain{
 			Tld:        tld,
-			Subdomains: strings.Split(subdomains, ","),
+			Subdomains: strings.Split(strings.ReplaceAll(subdomains, " ", ""), ","),
 		})
 	}
 }
