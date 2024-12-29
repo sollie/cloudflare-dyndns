@@ -43,39 +43,46 @@ func main() {
 		}
 
 		for _, subdomain := range domain.Subdomains {
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			defer cancel()
-
-			recordName := subdomain + "." + domain.Tld
-			record, err := getRecord(ctx, cfClient, zoneID, recordName)
-			if err != nil {
-				if err.Error() == "record not found" {
-					newRecord, err := createDNSRecord(ctx, cfClient, zoneID, "A", recordName, "127.0.0.1", 300)
-					if err != nil {
-						slog.Error(err.Error())
-						continue
-					}
-					slog.Debug("Created record " + recordName)
-					record = newRecord
-				} else {
-					slog.Error(err.Error())
-					continue
-				}
-			}
-
-			if record.Content == wanip {
-				slog.Debug("Record " + recordName + " is up to date")
-				continue
-			}
-
-			err = updateRecord(ctx, cfClient, zoneID, record.ID, recordName, wanip)
+			timeout := time.Second * 5
+			err := handleSubdomains(cfClient, zoneID, subdomain, domain.Tld, wanip, timeout)
 			if err != nil {
 				slog.Error(err.Error())
-				continue
 			}
-			slog.Debug("Updated record " + recordName + " with IP " + wanip)
 		}
 	}
+}
+
+func handleSubdomains(api *cloudflare.API, zoneID string, subdomain string, domain string, wanip string, timeout time.Duration) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	recordName := subdomain + "." + domain
+	record, err := getRecord(ctx, api, zoneID, recordName)
+	if err != nil {
+		if err.Error() == "record not found" {
+			newRecord, err := createDNSRecord(ctx, api, zoneID, "A", recordName, "127.0.0.1", 300)
+			if err != nil {
+				return err
+			}
+			slog.Debug("Created record " + recordName)
+			record = newRecord
+		} else {
+			return err
+		}
+	}
+
+	if record.Content == wanip {
+		slog.Debug("Record " + recordName + " is up to date")
+		return nil
+	}
+
+	err = updateRecord(ctx, api, zoneID, record.ID, recordName, wanip)
+	if err != nil {
+		return err
+	}
+
+	slog.Debug("Updated record " + recordName + " with IP " + wanip)
+	return nil
 }
 
 func getIP(target string, server string) string {
