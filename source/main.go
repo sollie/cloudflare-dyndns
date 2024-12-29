@@ -16,6 +16,14 @@ var (
 )
 
 func main() {
+	opts := &slog.HandlerOptions{
+		AddSource: false,
+		Level:     config.LogLevel,
+	}
+
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, opts))
+	slog.SetDefault(logger)
+
 	slog.Info(os.Args[0] + " version " + version)
 
 	wanip := getIP("whoami.cloudflare", "1.1.1.1")
@@ -39,26 +47,33 @@ func main() {
 			defer cancel()
 
 			recordName := subdomain + "." + domain.Tld
-			recordID, err := getRecordID(ctx, cfClient, zoneID, recordName)
+			record, err := getRecord(ctx, cfClient, zoneID, recordName)
 			if err != nil {
 				if err.Error() == "record not found" {
-					record, err := createDNSRecord(ctx, cfClient, zoneID, "A", recordName, "127.0.0.1", 300)
+					newRecord, err := createDNSRecord(ctx, cfClient, zoneID, "A", recordName, "127.0.0.1", 300)
 					if err != nil {
 						slog.Error(err.Error())
 						continue
 					}
-					recordID = record.ID
+					slog.Debug("Created record " + recordName)
+					record = newRecord
 				} else {
 					slog.Error(err.Error())
 					continue
 				}
-
-				err = updateRecord(ctx, cfClient, zoneID, recordID, recordName, wanip)
-				if err != nil {
-					slog.Error(err.Error())
-					continue
-				}
 			}
+
+			if record.Content == wanip {
+				slog.Debug("Record " + recordName + " is up to date")
+				continue
+			}
+
+			err = updateRecord(ctx, cfClient, zoneID, record.ID, recordName, wanip)
+			if err != nil {
+				slog.Error(err.Error())
+				continue
+			}
+			slog.Debug("Updated record " + recordName + " with IP " + wanip)
 		}
 	}
 }
