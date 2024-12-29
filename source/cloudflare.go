@@ -31,18 +31,18 @@ func getZoneID(api *cloudflare.API, domain string) (string, error) {
 	return "", fmt.Errorf("zone not found: %s", domain)
 }
 
-func getRecordID(ctx context.Context, api *cloudflare.API, zoneID string, recordName string) (string, error) {
+func getRecord(ctx context.Context, api *cloudflare.API, zoneID string, recordName string) (cloudflare.DNSRecord, error) {
 	zone := cloudflare.ZoneIdentifier(zoneID)
 	records, _, err := api.ListDNSRecords(ctx, zone, cloudflare.ListDNSRecordsParams{Name: recordName})
 	if err != nil {
-		return "", err
+		return cloudflare.DNSRecord{}, err
 	}
 
 	if len(records) == 0 {
-		return "", fmt.Errorf("record not found")
+		return cloudflare.DNSRecord{}, fmt.Errorf("record not found")
 	}
 
-	return records[0].ID, nil
+	return records[0], nil
 }
 
 func createDNSRecord(ctx context.Context, client *cloudflare.API, zoneID, recordType, hostname, content string, ttl int) (cloudflare.DNSRecord, error) {
