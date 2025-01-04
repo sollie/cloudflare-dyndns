@@ -1,5 +1,5 @@
-github.com/cloudflare/cloudflare-go v0.112.0 h1:caFwqXdGJCl3rjVMgbPEn8iCYAg9JsRYV3dIVQE5d7g=
-github.com/cloudflare/cloudflare-go v0.112.0/go.mod h1:QB55kuJ5ZTeLNFcLJePfMuBilhu/LDKpLBmKFQIoSZ0=
+github.com/cloudflare/cloudflare-go v0.113.0 h1:qnOXmA6RbgZ4rg5gNBK5QGk0Pzbv8pnUYV3C4+8CU6w=
+github.com/cloudflare/cloudflare-go v0.113.0/go.mod h1:Dlm4BAnycHc0i8yLxQZb9b+OlMwYOAoDJsUOEFgpVvo=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/goccy/go-json v0.10.4 h1:JSwxQzIqKfmFX1swYPpUThQZp/Ka4wzJdK0LWVytLPM=

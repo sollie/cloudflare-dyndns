@@ -5,7 +5,7 @@ go 1.22.0
 toolchain go1.23.4
 
 require (
-	github.com/cloudflare/cloudflare-go v0.112.0
+	github.com/cloudflare/cloudflare-go v0.113.0
 	github.com/miekg/dns v1.1.62
 )
 
