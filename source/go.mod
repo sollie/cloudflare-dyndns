@@ -5,13 +5,13 @@ go 1.22.0
 toolchain go1.23.4
 
 require (
-	github.com/cloudflare/cloudflare-go v0.114.0
+	github.com/cloudflare/cloudflare-go v0.115.0
 	github.com/miekg/dns v1.1.63
 )
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/goccy/go-json v0.10.4 // indirect
+	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	golang.org/x/mod v0.22.0 // indirect
