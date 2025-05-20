@@ -6,7 +6,7 @@ RUN apk update && apk --no-cache add ca-certificates tzdata
 ADD source /builder
 RUN CGO_ENABLED=0 go build -o cloudflare-dyndns
 
-FROM ghcr.io/sollie/docker-upx:v4.2.4 AS upx
+FROM ghcr.io/sollie/docker-upx:v5.0.1 AS upx
 WORKDIR /upx
 COPY --from=builder /builder/cloudflare-dyndns /upx/cloudflare-dyndns
 RUN upx --best cloudflare-dyndns
