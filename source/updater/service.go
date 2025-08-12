@@ -2,7 +2,6 @@ package updater
 
 import (
 	"context"
-	"log/slog"
 	"time"
 
 	"github.com/sollie/cloudflare-dyndns/cloudflare"
@@ -38,7 +37,6 @@ func (s *Service) UpdateSubdomain(zoneID, subdomain, domain, wanIP string) error
 			if err != nil {
 				return err
 			}
-			slog.Debug("Created record " + recordName)
 			record = newRecord
 		} else {
 			return err
@@ -46,7 +44,6 @@ func (s *Service) UpdateSubdomain(zoneID, subdomain, domain, wanIP string) error
 	}
 
 	if record.Content == wanIP {
-		slog.Debug("Record " + recordName + " is up to date")
 		return nil
 	}
 
@@ -55,6 +52,5 @@ func (s *Service) UpdateSubdomain(zoneID, subdomain, domain, wanIP string) error
 		return err
 	}
 
-	slog.Debug("Updated record " + recordName + " with IP " + wanIP)
 	return nil
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 
@@ -27,14 +28,14 @@ func main() {
 	resolver := dns.NewResolver("1.1.1.1", "whoami.cloudflare")
 	wanip, err := resolver.GetWANIP()
 	if err != nil {
-		slog.Error("Failed to get WAN IP: " + err.Error())
+		slog.Error(fmt.Sprintf("Failed to get WAN IP: %v", err))
 		os.Exit(1)
 	}
 	slog.Info("WAN IP: " + wanip)
 
 	cfClient, err := cloudflare.NewClient(config.Token)
 	if err != nil {
-		slog.Error(err.Error())
+		slog.Error(fmt.Sprintf("Failed to initialize Cloudflare client: %v", err))
 		os.Exit(1)
 	}
 
@@ -43,14 +44,17 @@ func main() {
 	for _, domain := range config.Domains {
 		zoneID, err := cfClient.GetZoneID(domain.Zone)
 		if err != nil {
-			slog.Error(err.Error())
+			slog.Error(fmt.Sprintf("Failed to get zone ID for %s: %v", domain.Zone, err))
 			continue
 		}
 
 		for _, subdomain := range domain.Subdomains {
+			recordName := subdomain + "." + domain.Zone
 			err := updateService.UpdateSubdomain(zoneID, subdomain, domain.Zone, wanip)
 			if err != nil {
-				slog.Error(err.Error())
+				slog.Error(fmt.Sprintf("Failed to update record %s: %v", recordName, err))
+			} else {
+				slog.Debug(fmt.Sprintf("Successfully processed record %s", recordName))
 			}
 		}
 	}

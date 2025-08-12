@@ -51,7 +51,7 @@ func init() {
 		config.Timeout = 5 * time.Second
 	} else {
 		if timeoutSeconds, err := strconv.Atoi(timeoutStr); err != nil {
-			slog.Warn("Invalid CFDD_TIMEOUT_SECONDS, using default 5 seconds")
+			slog.Warn(fmt.Sprintf("Invalid CFDD_TIMEOUT_SECONDS value '%s', using default 5 seconds", timeoutStr))
 			config.Timeout = 5 * time.Second
 		} else {
 			config.Timeout = time.Duration(timeoutSeconds) * time.Second
@@ -63,7 +63,7 @@ func init() {
 		config.TTL = 300
 	} else {
 		if ttl, err := strconv.Atoi(ttlStr); err != nil {
-			slog.Warn("Invalid CFDD_TTL, using default 300")
+			slog.Warn(fmt.Sprintf("Invalid CFDD_TTL value '%s', using default 300", ttlStr))
 			config.TTL = 300
 		} else {
 			config.TTL = ttl
@@ -88,7 +88,7 @@ func init() {
 	}
 
 	if err := validateConfig(); err != nil {
-		slog.Error("Configuration validation failed: " + err.Error())
+		slog.Error(fmt.Sprintf("Configuration validation failed: %v", err))
 		os.Exit(1)
 	}
 }
