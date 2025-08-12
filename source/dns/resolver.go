@@ -7,12 +7,16 @@ import (
 	"github.com/miekg/dns"
 )
 
+type WanIPResolver interface {
+	GetWANIP() (string, error)
+}
+
 type Resolver struct {
 	server string
 	target string
 }
 
-func NewResolver(server, target string) *Resolver {
+func NewResolver(server, target string) WanIPResolver {
 	return &Resolver{
 		server: server,
 		target: target,

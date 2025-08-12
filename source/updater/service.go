@@ -8,13 +8,17 @@ import (
 	"github.com/sollie/cloudflare-dyndns/cloudflare"
 )
 
+type DNSUpdater interface {
+	UpdateSubdomain(zoneID, subdomain, domain, wanIP string) error
+}
+
 type Service struct {
-	client  *cloudflare.Client
+	client  cloudflare.DNSClient
 	timeout time.Duration
 	ttl     int
 }
 
-func NewService(client *cloudflare.Client, timeout time.Duration, ttl int) *Service {
+func NewService(client cloudflare.DNSClient, timeout time.Duration, ttl int) DNSUpdater {
 	return &Service{
 		client:  client,
 		timeout: timeout,

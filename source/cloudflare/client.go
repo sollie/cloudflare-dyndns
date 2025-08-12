@@ -7,11 +7,18 @@ import (
 	"github.com/cloudflare/cloudflare-go"
 )
 
+type DNSClient interface {
+	GetZoneID(domain string) (string, error)
+	GetRecord(ctx context.Context, zoneID, recordName string) (cloudflare.DNSRecord, error)
+	CreateRecord(ctx context.Context, zoneID, recordType, hostname, content string, ttl int) (cloudflare.DNSRecord, error)
+	UpdateRecord(ctx context.Context, zoneID, recordID, hostname, content string) error
+}
+
 type Client struct {
 	api *cloudflare.API
 }
 
-func NewClient(token string) (*Client, error) {
+func NewClient(token string) (DNSClient, error) {
 	api, err := cloudflare.NewWithAPIToken(token)
 	if err != nil {
 		return nil, err
