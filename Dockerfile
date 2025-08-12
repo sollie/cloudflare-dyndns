@@ -3,7 +3,7 @@ FROM golang:1.24.6-alpine AS builder
 WORKDIR /builder
 RUN apk update && apk --no-cache add ca-certificates tzdata
 
-ADD source /builder
+COPY source /builder
 RUN CGO_ENABLED=0 go build -o cloudflare-dyndns
 
 FROM ghcr.io/sollie/docker-upx:v5.0.1 AS upx

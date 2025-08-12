@@ -1,18 +1,17 @@
 package main
 
 import (
-	"context"
+	"fmt"
 	"log/slog"
 	"os"
-	"time"
 
-	"github.com/cloudflare/cloudflare-go"
-	"github.com/miekg/dns"
+	"github.com/sollie/cloudflare-dyndns/cloudflare"
+	"github.com/sollie/cloudflare-dyndns/dns"
+	"github.com/sollie/cloudflare-dyndns/updater"
 )
 
 var (
-	version  = "GIT"
-	cfClient *cloudflare.API
+	version = "GIT"
 )
 
 func main() {
@@ -26,83 +25,37 @@ func main() {
 
 	slog.Info(os.Args[0] + " version " + version)
 
-	wanip := getIP("whoami.cloudflare", "1.1.1.1")
+	resolver := dns.NewResolver("1.1.1.1", "whoami.cloudflare")
+	wanip, err := resolver.GetWANIP()
+	if err != nil {
+		slog.Error(fmt.Sprintf("Failed to get WAN IP: %v", err))
+		os.Exit(1)
+	}
 	slog.Info("WAN IP: " + wanip)
 
-	cfClient, err := cloudflareInit()
+	cfClient, err := cloudflare.NewClient(config.Token)
 	if err != nil {
-		slog.Error(err.Error())
+		slog.Error(fmt.Sprintf("Failed to initialize Cloudflare client: %v", err))
 		os.Exit(1)
 	}
 
+	updateService := updater.NewService(cfClient, config.Timeout, config.TTL)
+
 	for _, domain := range config.Domains {
-		zoneID, err := getZoneID(cfClient, domain.Tld)
+		zoneID, err := cfClient.GetZoneID(domain.Zone)
 		if err != nil {
-			slog.Error(err.Error())
+			slog.Error(fmt.Sprintf("Failed to get zone ID for %s: %v", domain.Zone, err))
 			continue
 		}
 
 		for _, subdomain := range domain.Subdomains {
-			timeout := time.Second * 5
-			err := handleSubdomains(cfClient, zoneID, subdomain, domain.Tld, wanip, timeout)
+			recordName := subdomain + "." + domain.Zone
+			err := updateService.UpdateSubdomain(zoneID, subdomain, domain.Zone, wanip)
 			if err != nil {
-				slog.Error(err.Error())
+				slog.Error(fmt.Sprintf("Failed to update record %s: %v", recordName, err))
+			} else {
+				slog.Debug(fmt.Sprintf("Successfully processed record %s", recordName))
 			}
 		}
 	}
-}
-
-func handleSubdomains(api *cloudflare.API, zoneID string, subdomain string, domain string, wanip string, timeout time.Duration) error {
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-	defer cancel()
-
-	recordName := subdomain + "." + domain
-	record, err := getRecord(ctx, api, zoneID, recordName)
-	if err != nil {
-		if err.Error() == "record not found" {
-			newRecord, err := createDNSRecord(ctx, api, zoneID, "A", recordName, "127.0.0.1", 300)
-			if err != nil {
-				return err
-			}
-			slog.Debug("Created record " + recordName)
-			record = newRecord
-		} else {
-			return err
-		}
-	}
-
-	if record.Content == wanip {
-		slog.Debug("Record " + recordName + " is up to date")
-		return nil
-	}
-
-	err = updateRecord(ctx, api, zoneID, record.ID, recordName, wanip)
-	if err != nil {
-		return err
-	}
-
-	slog.Debug("Updated record " + recordName + " with IP " + wanip)
-	return nil
-}
-
-func getIP(target string, server string) string {
-	m := new(dns.Msg)
-	m.Id = dns.Id()
-	m.RecursionDesired = true
-	m.Question = make([]dns.Question, 1)
-	m.Question[0] = dns.Question{Name: target + ".", Qtype: dns.TypeTXT, Qclass: dns.ClassCHAOS}
-
-	c := dns.Client{}
-	c.Net = "udp4"
-
-	r, _, err := c.Exchange(m, server+":53")
-	if err != nil {
-		slog.Error(err.Error())
-	}
-	if len(r.Answer) == 0 {
-		slog.Warn("No answer")
-	}
-
-	Arec := r.Answer[0].(*dns.TXT)
-	return string(Arec.Txt[0])
 }
