@@ -65,7 +65,7 @@ func handleSubdomains(api *cloudflare.API, zoneID string, subdomain string, doma
 	record, err := getRecord(ctx, api, zoneID, recordName)
 	if err != nil {
 		if err.Error() == "record not found" {
-			newRecord, err := createDNSRecord(ctx, api, zoneID, "A", recordName, "127.0.0.1", 300)
+			newRecord, err := createDNSRecord(ctx, api, zoneID, "A", recordName, wanip, 300)
 			if err != nil {
 				return err
 			}
