@@ -29,13 +29,13 @@ func init() {
 		os.Exit(1)
 	}
 
-	logLevel := os.Getenv("CFDD_LOG_LEVEL")
+	logLevel := strings.ToLower(os.Getenv("CFDD_LOG_LEVEL"))
 	switch logLevel {
-	case "Debug":
+	case "debug":
 		config.LogLevel = slog.LevelDebug
-	case "Error":
+	case "error":
 		config.LogLevel = slog.LevelError
-	case "Info":
+	case "info":
 		config.LogLevel = slog.LevelInfo
 	default:
 		config.LogLevel = slog.LevelWarn
