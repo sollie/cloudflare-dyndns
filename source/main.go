@@ -48,8 +48,7 @@ func main() {
 		}
 
 		for _, subdomain := range domain.Subdomains {
-			timeout := time.Second * 5
-			err := handleSubdomains(cfClient, zoneID, subdomain, domain.Zone, wanip, timeout)
+			err := handleSubdomains(cfClient, zoneID, subdomain, domain.Zone, wanip, config.Timeout)
 			if err != nil {
 				slog.Error(err.Error())
 			}
@@ -65,7 +64,7 @@ func handleSubdomains(api *cloudflare.API, zoneID string, subdomain string, doma
 	record, err := getRecord(ctx, api, zoneID, recordName)
 	if err != nil {
 		if err.Error() == "record not found" {
-			newRecord, err := createDNSRecord(ctx, api, zoneID, "A", recordName, wanip, 300)
+			newRecord, err := createDNSRecord(ctx, api, zoneID, "A", recordName, wanip, config.TTL)
 			if err != nil {
 				return err
 			}

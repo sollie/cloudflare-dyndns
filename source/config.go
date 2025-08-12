@@ -4,13 +4,17 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type Config struct {
 	Token    string
 	Domains  []Domain
 	LogLevel slog.Level
+	Timeout  time.Duration
+	TTL      int
 }
 
 type Domain struct {
@@ -39,6 +43,30 @@ func init() {
 		config.LogLevel = slog.LevelInfo
 	default:
 		config.LogLevel = slog.LevelWarn
+	}
+
+	timeoutStr := os.Getenv("CFDD_TIMEOUT_SECONDS")
+	if timeoutStr == "" {
+		config.Timeout = 5 * time.Second
+	} else {
+		if timeoutSeconds, err := strconv.Atoi(timeoutStr); err != nil {
+			slog.Warn("Invalid CFDD_TIMEOUT_SECONDS, using default 5 seconds")
+			config.Timeout = 5 * time.Second
+		} else {
+			config.Timeout = time.Duration(timeoutSeconds) * time.Second
+		}
+	}
+
+	ttlStr := os.Getenv("CFDD_TTL")
+	if ttlStr == "" {
+		config.TTL = 300
+	} else {
+		if ttl, err := strconv.Atoi(ttlStr); err != nil {
+			slog.Warn("Invalid CFDD_TTL, using default 300")
+			config.TTL = 300
+		} else {
+			config.TTL = ttl
+		}
 	}
 
 	for i := 1; ; i++ {
