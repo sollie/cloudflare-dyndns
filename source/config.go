@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -85,4 +86,44 @@ func init() {
 			Subdomains: strings.Split(strings.ReplaceAll(subdomains, " ", ""), ","),
 		})
 	}
+
+	if err := validateConfig(); err != nil {
+		slog.Error("Configuration validation failed: " + err.Error())
+		os.Exit(1)
+	}
+}
+
+func validateConfig() error {
+	if len(config.Domains) == 0 {
+		return fmt.Errorf("no domains configured - please set CFDD_ZONE_1 and CFDD_SUBDOMAINS_1")
+	}
+
+	domainRegex := regexp.MustCompile(`^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$`)
+	subdomainRegex := regexp.MustCompile(`^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$`)
+
+	for i, domain := range config.Domains {
+		if domain.Zone == "" {
+			return fmt.Errorf("domain %d has empty zone name", i+1)
+		}
+
+		if !domainRegex.MatchString(domain.Zone) {
+			return fmt.Errorf("domain %d has invalid zone name format: %s", i+1, domain.Zone)
+		}
+
+		if len(domain.Subdomains) == 0 {
+			return fmt.Errorf("domain %d (%s) has no subdomains configured", i+1, domain.Zone)
+		}
+
+		for j, subdomain := range domain.Subdomains {
+			if subdomain == "" {
+				return fmt.Errorf("domain %d (%s) has empty subdomain at position %d", i+1, domain.Zone, j+1)
+			}
+
+			if !subdomainRegex.MatchString(subdomain) {
+				return fmt.Errorf("domain %d (%s) has invalid subdomain format: %s", i+1, domain.Zone, subdomain)
+			}
+		}
+	}
+
+	return nil
 }
