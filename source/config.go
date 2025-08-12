@@ -14,7 +14,7 @@ type Config struct {
 }
 
 type Domain struct {
-	Tld        string
+	Zone       string
 	Subdomains []string
 }
 
@@ -42,18 +42,18 @@ func init() {
 	}
 
 	for i := 1; ; i++ {
-		tldKey := fmt.Sprintf("CFDD_TLD_%d", i)
+		zoneKey := fmt.Sprintf("CFDD_ZONE_%d", i)
 		subdomainsKey := fmt.Sprintf("CFDD_SUBDOMAINS_%d", i)
 
-		tld := os.Getenv(tldKey)
+		zone := os.Getenv(zoneKey)
 		subdomains := os.Getenv(subdomainsKey)
 
-		if tld == "" || subdomains == "" {
+		if zone == "" || subdomains == "" {
 			break
 		}
 
 		config.Domains = append(config.Domains, Domain{
-			Tld:        tld,
+			Zone:       zone,
 			Subdomains: strings.Split(strings.ReplaceAll(subdomains, " ", ""), ","),
 		})
 	}

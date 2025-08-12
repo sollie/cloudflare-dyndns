@@ -11,8 +11,7 @@ import (
 )
 
 var (
-	version  = "GIT"
-	cfClient *cloudflare.API
+	version = "GIT"
 )
 
 func main() {
@@ -36,7 +35,7 @@ func main() {
 	}
 
 	for _, domain := range config.Domains {
-		zoneID, err := getZoneID(cfClient, domain.Tld)
+		zoneID, err := getZoneID(cfClient, domain.Zone)
 		if err != nil {
 			slog.Error(err.Error())
 			continue
@@ -44,7 +43,7 @@ func main() {
 
 		for _, subdomain := range domain.Subdomains {
 			timeout := time.Second * 5
-			err := handleSubdomains(cfClient, zoneID, subdomain, domain.Tld, wanip, timeout)
+			err := handleSubdomains(cfClient, zoneID, subdomain, domain.Zone, wanip, timeout)
 			if err != nil {
 				slog.Error(err.Error())
 			}
