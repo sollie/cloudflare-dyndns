@@ -300,13 +300,21 @@ When adding new features or modifying existing code, follow these standards to m
 
 Always use structured logging with `slog.Error` and include descriptive context. Follow this pattern:
 
+// For critical errors (e.g., config, auth failures)
 ```go
 result, err := someOperation()
 if err != nil {
-    slog.Error("Failed to perform operation", "error", err)
-    os.Exit(1) // For critical errors
-    // OR
-    continue // For non-critical errors that can be skipped
+    slog.Error(fmt.Sprintf("Failed to perform operation: %v", err))
+    os.Exit(1)
+}
+```
+
+// For non-critical errors (e.g., individual DNS record update failures in a loop)
+```go
+result, err := someOperation()
+if err != nil {
+    slog.Error(fmt.Sprintf("Failed to perform operation: %v", err))
+    continue
 }
 ```
 
