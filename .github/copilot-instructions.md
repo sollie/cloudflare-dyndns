@@ -309,8 +309,8 @@ if err != nil {
 }
 ```
 
-// For non-critical errors (e.g., individual DNS record update failures in a loop)
 ```go
+// For non-critical errors (e.g., individual DNS record update failures in a loop)
 result, err := someOperation()
 if err != nil {
     slog.Error(fmt.Sprintf("Failed to perform operation: %v", err))
