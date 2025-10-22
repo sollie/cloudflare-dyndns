@@ -303,7 +303,7 @@ Always use structured logging with `slog.Error` and include descriptive context.
 ```go
 result, err := someOperation()
 if err != nil {
-    slog.Error(fmt.Sprintf("Failed to perform operation: %v", err))
+    slog.Error("Failed to perform operation", "error", err)
     os.Exit(1) // For critical errors
     // OR
     continue // For non-critical errors that can be skipped
