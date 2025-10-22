@@ -300,8 +300,8 @@ When adding new features or modifying existing code, follow these standards to m
 
 Always use structured logging with `slog.Error` and include descriptive context. Follow this pattern:
 
-// For critical errors (e.g., config, auth failures)
 ```go
+// For critical errors (e.g., config, auth failures)
 result, err := someOperation()
 if err != nil {
     slog.Error(fmt.Sprintf("Failed to perform operation: %v", err))
