@@ -283,3 +283,68 @@ Validation failures cause immediate exit with descriptive error messages.
 7. **Dependencies**: Only add dependencies if absolutely necessary. This is intentionally a small, focused application.
 
 8. **Trust These Instructions**: These instructions are accurate as of the last repository state. Only search for additional information if you find these instructions incomplete or encounter unexpected behavior.
+
+## Coding Standards for New Code
+
+When adding new features or modifying existing code, follow these standards to maintain consistency with the existing codebase:
+
+### Adding New Features
+
+1. **Keep it minimal**: Only add what's necessary. This is intentionally a small, focused application.
+2. **Follow existing patterns**: Review similar code in the repository before implementing new functionality.
+3. **Use structured logging**: All logging must use `log/slog` with appropriate levels (Debug, Info, Warn, Error).
+4. **Fail fast**: Exit with non-zero status on critical errors (config, auth, network failures).
+5. **Use contexts**: All API calls and operations with timeouts should use `context.Context`.
+
+### Error Handling Pattern
+
+Always use structured logging with `slog.Error` and include descriptive context. Follow this pattern:
+
+```go
+result, err := someOperation()
+if err != nil {
+    slog.Error(fmt.Sprintf("Failed to perform operation: %v", err))
+    os.Exit(1) // For critical errors
+    // OR
+    continue // For non-critical errors that can be skipped
+}
+```
+
+**Key points:**
+- Use `fmt.Sprintf` to format error messages with context
+- Include what failed and the error details
+- Critical errors (config, auth) should call `os.Exit(1)`
+- Non-critical errors (individual DNS updates) can continue processing
+
+### Security Guidelines
+
+1. **Never log sensitive data**: API tokens, credentials, and secrets must NEVER be logged.
+   - ✅ Good: `slog.Error("CFDD_TOKEN is required")`
+   - ❌ Bad: `slog.Error(fmt.Sprintf("Invalid token: %s", token))`
+
+2. **Validate all inputs**: Use regex patterns or validation functions for user-supplied data.
+   - Domain names: `^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$`
+   - Subdomains: `^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$`
+
+3. **Sanitize error messages**: Ensure error messages don't leak sensitive information about the system or configuration.
+
+### Dependencies Guidelines
+
+1. **Minimize dependencies**: Only add new dependencies if absolutely necessary. Each dependency increases attack surface and maintenance burden.
+
+2. **Use official libraries**: Prefer official SDKs (like `cloudflare-go`) over third-party alternatives.
+
+3. **Run `go mod tidy` from the correct directory**:
+   ```bash
+   cd source
+   go mod tidy
+   ```
+   ALWAYS run from `/source` directory, not the repository root.
+
+4. **Verify builds after dependency changes**:
+   ```bash
+   cd source
+   go build -o cloudflare-dyndns
+   ```
+
+5. **Check for vulnerabilities**: Before adding dependencies, ensure they don't have known security issues.
